@@ -6,8 +6,8 @@
 clusterGroup:
   name: baremetal
   isHubCluster: true
+  # rhgaudi3s2: namespaces of disabled components (ACM, CNV, LVMS, GPU, KubeVirt VMs) removed
   namespaces:
-  - open-cluster-management
   - vault
   - external-secrets-operator:
       operatorGroup: true
@@ -19,21 +19,18 @@ clusterGroup:
   - cert-manager
   - hello-openshift
   - kbs-access
-  - openshift-cnv
-  - openshift-storage
   - openshift-nfd
   - baremetal
   - intel-dcap
   - intel-dcap-operator-system:
       operatorGroup: true
       targetNamespaces: []
-  - nvidia-gpu-operator
-  - gpu-workload
   - kyverno
-  - kubevirt-vms
 
   subscriptions:
     acm:
+      # rhgaudi3s2: disabled, single CPU-only SNO, nothing in this clusterGroup uses ACM policies
+      disabled: true
       name: advanced-cluster-management
       namespace: open-cluster-management
       annotations:
@@ -67,11 +64,15 @@ clusterGroup:
       annotations:
         argocd.argoproj.io/sync-wave: "10"
     lvm-operator:
+      # rhgaudi3s2: disabled, storage comes from the existing nfs-storage default SC
+      disabled: true
       name: lvms-operator
       namespace: openshift-storage
       annotations:
         argocd.argoproj.io/sync-wave: "10"
     cnv:
+      # rhgaudi3s2: disabled, only needed for the hostpath provisioner and KubeVirt CVMs
+      disabled: true
       name: kubevirt-hyperconverged
       namespace: openshift-cnv
       channel: stable
@@ -204,6 +205,7 @@ clusterGroup:
 
   applications:
     acm:
+      disabled: true
       name: acm
       namespace: open-cluster-management
       project: hub
@@ -253,7 +255,7 @@ clusterGroup:
           value: "true"
         # GPU attestation — enables NVIDIA CC GPU reference value verification
         - name: kbs.gpu.enabled
-          value: "true"
+          value: "false"  # rhgaudi3s2: CPU-only, no NVIDIA CC GPU
         # Bare metal mode — uses firmware reference values (not peer-pod PCR measurements)
         - name: kbs.baremetal.enabled
           value: "true"
@@ -275,6 +277,8 @@ clusterGroup:
 #          value: "false"
 
     storage:
+      # rhgaudi3s2: disabled, with storageProvider=external the chart renders nothing anyway
+      disabled: true
       name: storage
       namespace: openshift-storage
       project: hub
