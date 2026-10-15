@@ -15,11 +15,14 @@ clusterGroup:
   - external-secrets
   - openshift-sandboxed-containers-operator
   - trustee-operator-system
-  - cert-manager-operator
+  # rhgaudi3s2: lab already owns OperatorGroups here, a second one breaks OLM (TooManyOperatorGroups)
+  - cert-manager-operator:
+      operatorGroup: false
   - cert-manager
   - hello-openshift
   - kbs-access
-  - openshift-nfd
+  - openshift-nfd:
+      operatorGroup: false
   - baremetal
   - intel-dcap
   - intel-dcap-operator-system:
@@ -58,6 +61,8 @@ clusterGroup:
       annotations:
         argocd.argoproj.io/sync-wave: "10"
     cert-manager:
+      # rhgaudi3s2: already installed by the lab (Manual approval), do not take it over
+      disabled: true
       name: openshift-cert-manager-operator
       namespace: cert-manager-operator
       channel: stable-v1
@@ -79,6 +84,8 @@ clusterGroup:
       annotations:
         argocd.argoproj.io/sync-wave: "10"
     nfd:
+      # rhgaudi3s2: already installed by the lab (Manual approval), do not take it over
+      disabled: true
       name: nfd
       namespace: openshift-nfd
       channel: stable
