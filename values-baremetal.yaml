@@ -18,7 +18,8 @@ clusterGroup:
   # rhgaudi3s2: lab already owns OperatorGroups here, a second one breaks OLM (TooManyOperatorGroups)
   - cert-manager-operator:
       operatorGroup: false
-  - cert-manager
+  - cert-manager:
+      operatorGroup: false
   - hello-openshift
   - kbs-access
   - openshift-nfd:
