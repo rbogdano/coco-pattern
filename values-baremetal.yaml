@@ -6,8 +6,9 @@
 clusterGroup:
   name: baremetal
   isHubCluster: true
-  # rhgaudi3s2: namespaces of disabled components (ACM, CNV, LVMS, GPU, KubeVirt VMs) removed
+  # rhgaudi3s2: namespaces of disabled components (CNV, LVMS, GPU, KubeVirt VMs) removed
   namespaces:
+  - open-cluster-management
   - vault
   - external-secrets-operator:
       operatorGroup: true
@@ -29,12 +30,15 @@ clusterGroup:
   - intel-dcap-operator-system:
       operatorGroup: true
       targetNamespaces: []
+  # rhgaudi3s2: dedicated AllNamespaces OperatorGroup, see intel-device-plugins subscription
+  - intel-device-plugins-operator:
+      operatorGroup: true
+      targetNamespaces: []
   - kyverno
 
   subscriptions:
     acm:
-      # rhgaudi3s2: disabled, single CPU-only SNO, nothing in this clusterGroup uses ACM policies
-      disabled: true
+      # ACM is required: Trustee RVPS reference values and init-data are rendered by ACM policy templates
       name: advanced-cluster-management
       namespace: open-cluster-management
       annotations:
@@ -94,7 +98,9 @@ clusterGroup:
         argocd.argoproj.io/sync-wave: "10"
     intel-device-plugins:
       name: intel-device-plugins-operator
-      namespace: openshift-operators
+      # rhgaudi3s2: not openshift-operators, there the InstallPlan would also approve
+      # the lab's pending Manual upgrades of Service Mesh, Tempo and OpenTelemetry
+      namespace: intel-device-plugins-operator
       source: certified-operators
       sourceNamespace: openshift-marketplace
       channel: stable
@@ -213,7 +219,6 @@ clusterGroup:
 
   applications:
     acm:
-      disabled: true
       name: acm
       namespace: open-cluster-management
       project: hub
